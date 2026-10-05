@@ -2,4 +2,7 @@
   <Folder Name="/api/">
     <Project Path="api/UptimeMonitor.Api.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/UptimeMonitor.Tests.csproj" />
+  </Folder>
 </Solution>
