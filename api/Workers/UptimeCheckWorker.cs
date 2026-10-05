@@ -2,12 +2,14 @@ using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using UptimeMonitor.Api.Data;
 using UptimeMonitor.Api.Models;
+using UptimeMonitor.Api.Alerts;
 
 namespace UptimeMonitor.Api.Workers;
 
 public class UptimeCheckWorker(
     IServiceScopeFactory scopeFactory,
     IHttpClientFactory httpClientFactory,
+    DiscordAlertService alertService,
     ILogger<UptimeCheckWorker> logger) : BackgroundService
 {
     private static readonly TimeSpan Tick = TimeSpan.FromSeconds(5);
@@ -50,6 +52,18 @@ public class UptimeCheckWorker(
 
             db.CheckResults.Add(result);
             service.LastCheckedAt = result.CheckedAt;
+
+            var previousIsUp = service.IsUp;
+            service.IsUp = result.IsSuccess;
+
+            if (StatusTransition.ShouldAlert(previousIsUp, result.IsSuccess))
+            {
+                var message = result.IsSuccess
+                ? $"✅ **{service.Name}** voltou ao ar ({result.ResponseTimeMs}ms)"
+                : $"🔴 **{service.Name}** caiu: {result.Error ?? $"status {result.StatusCode}"}";
+
+                await alertService.SendAsync(message, ct);
+            }
 
             logger.LogInformation(
                 "{Name}: {Status} em {Ms}ms",

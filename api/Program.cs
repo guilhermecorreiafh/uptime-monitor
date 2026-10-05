@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using UptimeMonitor.Api.Data;
 using Scalar.AspNetCore;
 using UptimeMonitor.Api.Workers;
+using UptimeMonitor.Api.Alerts;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,8 @@ options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
 builder.Services.AddHttpClient();
 builder.Services.AddHostedService<UptimeCheckWorker>();
+
+builder.Services.AddSingleton<DiscordAlertService>();
 
 var app = builder.Build();
 
