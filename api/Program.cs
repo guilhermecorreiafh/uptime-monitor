@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using UptimeMonitor.Api.Data;
 using Scalar.AspNetCore;
+using UptimeMonitor.Api.Workers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,10 +11,13 @@ builder.Services.AddControllers();
 
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<AppDbContext>();
-    
+
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<AppDbContext>(options =>
 options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
+
+builder.Services.AddHttpClient();
+builder.Services.AddHostedService<UptimeCheckWorker>();
 
 var app = builder.Build();
 
