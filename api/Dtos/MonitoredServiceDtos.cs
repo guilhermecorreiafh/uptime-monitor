@@ -16,6 +16,7 @@ public record MonitoredServiceResponse(
     int IntervalSeconds,
     int TimeoutSeconds,
     bool IsActive,
+    bool? IsUp,
     DateTime CreatedAt);
 
 public record CheckResultResponse(
