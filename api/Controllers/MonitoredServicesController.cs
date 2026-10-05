@@ -49,6 +49,40 @@ public class MonitoredServicesController(AppDbContext db) : ControllerBase
         return CreatedAtAction(nameof(GetById), new {id = service.Id}, ToResponse(service));
     }
 
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> Update(int id, MonitoredServiceRequest request)
+    {
+        var service = await db.MonitoredServices.FindAsync(id);
+
+        if(service is null)
+            return NotFound();
+
+        service.Name = request.Name;
+        service.Url = request.Url;
+        service.IntervalSeconds = request.IntervalSeconds;
+        service.TimeoutSeconds = request.TimeoutSeconds;
+        service.IsActive = request.IsActive;
+
+        await db.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var service = await db.MonitoredServices.FindAsync(id);
+        
+        if(service is null)
+            return NotFound();
+
+            db.MonitoredServices.Remove(service);
+            await db.SaveChangesAsync();
+
+            return NoContent();
+    }
+
+
     private static MonitoredServiceResponse ToResponse(MonitoredService s) =>
         new(s.Id, s.Name, s.Url, s.IntervalSeconds, s.TimeoutSeconds, s.IsActive, s.CreatedAt);
 }
