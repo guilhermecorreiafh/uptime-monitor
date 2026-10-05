@@ -26,7 +26,7 @@ public class MonitoredServicesController(AppDbContext db) : ControllerBase
         var service = await db.MonitoredServices.FindAsync(id);
 
         if (service is null)
-        return NotFound();
+            return NotFound();
 
         return ToResponse(service);
     }
@@ -46,7 +46,7 @@ public class MonitoredServicesController(AppDbContext db) : ControllerBase
         db.MonitoredServices.Add(service);
         await db.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(GetById), new {id = service.Id}, ToResponse(service));
+        return CreatedAtAction(nameof(GetById), new { id = service.Id }, ToResponse(service));
     }
 
     [HttpPut("{id:int}")]
@@ -54,7 +54,7 @@ public class MonitoredServicesController(AppDbContext db) : ControllerBase
     {
         var service = await db.MonitoredServices.FindAsync(id);
 
-        if(service is null)
+        if (service is null)
             return NotFound();
 
         service.Name = request.Name;
@@ -72,16 +72,36 @@ public class MonitoredServicesController(AppDbContext db) : ControllerBase
     public async Task<IActionResult> Delete(int id)
     {
         var service = await db.MonitoredServices.FindAsync(id);
-        
-        if(service is null)
+
+        if (service is null)
             return NotFound();
 
-            db.MonitoredServices.Remove(service);
-            await db.SaveChangesAsync();
+        db.MonitoredServices.Remove(service);
+        await db.SaveChangesAsync();
 
-            return NoContent();
+        return NoContent();
     }
 
+    [HttpGet("{id:int}/results")]
+    public async Task<ActionResult<List<CheckResultResponse>>> GetResults(int id, [FromQuery] int limit = 50)
+    {
+        var exists = await db.MonitoredServices.AnyAsync(s => s.Id == id);
+
+        if (!exists)
+            return NotFound();
+
+        limit = Math.Clamp(limit, 1, 500);
+
+        var results = await db.CheckResults
+        .Where(r => r.MonitoredServiceId == id)
+        .OrderByDescending(r => r.CheckedAt)
+        .Take(limit)
+        .Select(r => new CheckResultResponse(
+            r.CheckedAt, r.IsSuccess, r.StatusCode, r.ResponseTimeMs, r.Error))
+        .ToListAsync();
+
+        return results;
+    }
 
     private static MonitoredServiceResponse ToResponse(MonitoredService s) =>
         new(s.Id, s.Name, s.Url, s.IntervalSeconds, s.TimeoutSeconds, s.IsActive, s.CreatedAt);

@@ -17,3 +17,10 @@ public record MonitoredServiceResponse(
     int TimeoutSeconds,
     bool IsActive,
     DateTime CreatedAt);
+
+public record CheckResultResponse(
+    DateTime CheckedAt,
+    bool IsSuccess,
+    int? StatusCode,
+    int ResponseTimeMs,
+    string? Error);
