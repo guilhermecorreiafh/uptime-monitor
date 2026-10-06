@@ -1,5 +1,5 @@
 # Uptime Monitor
 
-Serviço self-hosted que monitora endpoints HTTP e avisa quando eles caem.
+![CI](https://github.com/guilhermecorreiafh/uptime-monitor/actions/workflows/ci.yml/badge.svg)
 
-🚧 Em desenvolvimento
+Serviço self-hosted que monitora endpoints HTTP e avisa quando eles caem.
