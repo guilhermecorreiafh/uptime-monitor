@@ -2,4 +2,4 @@
 
 ![CI](https://github.com/guilhermecorreiafh/uptime-monitor/actions/workflows/ci.yml/badge.svg)
 
-Serviço self-hosted que monitora endpoints HTTP e avisa quando eles caem.
+Monitor de uptime self-hosted em .NET e React, com alertas quando um serviço cai.
