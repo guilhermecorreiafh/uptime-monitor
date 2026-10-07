@@ -11,5 +11,6 @@ public class MonitoredService
     public DateTime CreatedAt {get; set;} = DateTime.UtcNow;
     public DateTime? LastCheckedAt { get; set; }
     public bool? IsUp {get; set;}
+    public int? LastResponseTimeMs {get; set;}
 
 }

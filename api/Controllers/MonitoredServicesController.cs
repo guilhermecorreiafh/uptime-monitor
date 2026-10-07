@@ -104,5 +104,5 @@ public class MonitoredServicesController(AppDbContext db) : ControllerBase
     }
 
     private static MonitoredServiceResponse ToResponse(MonitoredService s) =>
-        new(s.Id, s.Name, s.Url, s.IntervalSeconds, s.TimeoutSeconds, s.IsActive, s.IsUp, s.CreatedAt);
+        new(s.Id, s.Name, s.Url, s.IntervalSeconds, s.TimeoutSeconds, s.IsActive, s.IsUp, s.LastCheckedAt, s.LastResponseTimeMs, s.CreatedAt);
 }

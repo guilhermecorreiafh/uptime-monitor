@@ -55,6 +55,7 @@ public class UptimeCheckWorker(
 
             var previousIsUp = service.IsUp;
             service.IsUp = result.IsSuccess;
+            service.LastResponseTimeMs = result.ResponseTimeMs;
 
             if (StatusTransition.ShouldAlert(previousIsUp, result.IsSuccess))
             {

@@ -17,6 +17,8 @@ public record MonitoredServiceResponse(
     int TimeoutSeconds,
     bool IsActive,
     bool? IsUp,
+    DateTime? LastCheckedAt,
+    int? LastResponseTimeMs,
     DateTime CreatedAt);
 
 public record CheckResultResponse(
