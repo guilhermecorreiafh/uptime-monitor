@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { getServices } from './api'
 import { timeAgo } from './format'
+import { ServiceForm } from './ServiceForm'
 import type { MonitoredService } from './types'
 import { useTheme } from './useTheme'
 import './App.css'
@@ -10,20 +11,21 @@ function App() {
   const [error, setError] = useState<string | null>(null)
   const { theme, toggleTheme } = useTheme()
 
-  useEffect(() => {
-    const load = () =>
-      getServices()
-        .then(data => {
-          setServices(data)
-          setError(null)
-        })
-        .catch(() => setError('Não foi possível conectar à API'))
+  const load = useCallback(() => {
+    getServices()
+      .then(data => {
+        setServices(data)
+        setError(null)
+      })
+      .catch(() => setError('Não foi possível conectar à API'))
+  }, [])
 
+  useEffect(() => {
     load()
     const intervalId = setInterval(load, 5000)
 
     return () => clearInterval(intervalId)
-  }, [])
+  }, [load])
 
   const upCount = services.filter(s => s.isUp).length
 
@@ -41,6 +43,8 @@ function App() {
           {upCount} de {services.length} serviços no ar
         </p>
       )}
+
+      <ServiceForm onCreated={load} />
 
       {error && <p className="error">{error}</p>}
 
