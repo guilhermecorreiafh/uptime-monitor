@@ -9,6 +9,7 @@ import './App.css'
 function App() {
   const [services, setServices] = useState<MonitoredService[]>([])
   const [error, setError] = useState<string | null>(null)
+  const [editing, setEditing] = useState<MonitoredService | null>(null)
   const { theme, toggleTheme } = useTheme()
 
   const load = useCallback(() => {
@@ -34,6 +35,7 @@ function App() {
 
     try {
       await deleteService(service.id)
+      if (editing?.id === service.id) setEditing(null)
       load()
     } catch {
       setError('Não foi possível excluir o serviço')
@@ -55,7 +57,15 @@ function App() {
         </p>
       )}
 
-      <ServiceForm onCreated={load} />
+      <ServiceForm
+        key={editing?.id ?? 'new'}
+        editing={editing}
+        onSaved={() => {
+          setEditing(null)
+          load()
+        }}
+        onCancel={() => setEditing(null)}
+      />
 
       {error && <p className="error">{error}</p>}
 
@@ -78,6 +88,14 @@ function App() {
                 {timeAgo(service.lastCheckedAt)}
               </small>
             </div>
+
+            <button
+              className="edit"
+              onClick={() => setEditing(service)}
+              aria-label={`Editar ${service.name}`}
+            >
+              ✎
+            </button>
 
             <button
               className="delete"

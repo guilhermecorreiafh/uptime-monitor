@@ -1,14 +1,19 @@
 import { useState, type FormEvent } from 'react'
-import { createService } from './api'
+import { createService, updateService } from './api'
+import type { MonitoredService } from './types'
 
 type Props = {
-  onCreated: () => void
+  editing: MonitoredService | null
+  onSaved: () => void
+  onCancel: () => void
 }
 
-export function ServiceForm({ onCreated }: Props) {
-  const [name, setName] = useState('')
-  const [url, setUrl] = useState('')
-  const [intervalSeconds, setIntervalSeconds] = useState(60)
+const intervalOptions = [30, 60, 300]
+
+export function ServiceForm({ editing, onSaved, onCancel }: Props) {
+  const [name, setName] = useState(editing?.name ?? '')
+  const [url, setUrl] = useState(editing?.url ?? '')
+  const [intervalSeconds, setIntervalSeconds] = useState(editing?.intervalSeconds ?? 60)
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
 
@@ -18,13 +23,20 @@ export function ServiceForm({ onCreated }: Props) {
     setError(null)
 
     try {
-      await createService({ name, url, intervalSeconds })
-      setName('')
-      setUrl('')
-      setIntervalSeconds(60)
-      onCreated()
+      const data = { name, url, intervalSeconds }
+
+      if (editing) {
+        await updateService(editing.id, data)
+      } else {
+        await createService(data)
+        setName('')
+        setUrl('')
+        setIntervalSeconds(60)
+      }
+
+      onSaved()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao cadastrar serviço')
+      setError(err instanceof Error ? err.message : 'Erro ao salvar serviço')
     } finally {
       setSaving(false)
     }
@@ -47,13 +59,21 @@ export function ServiceForm({ onCreated }: Props) {
         required
       />
       <select value={intervalSeconds} onChange={e => setIntervalSeconds(Number(e.target.value))}>
+        {!intervalOptions.includes(intervalSeconds) && (
+          <option value={intervalSeconds}>{intervalSeconds}s</option>
+        )}
         <option value={30}>30s</option>
         <option value={60}>1 min</option>
         <option value={300}>5 min</option>
       </select>
       <button type="submit" disabled={saving}>
-        {saving ? 'Salvando...' : 'Adicionar'}
+        {saving ? 'Salvando...' : editing ? 'Salvar' : 'Adicionar'}
       </button>
+      {editing && (
+        <button type="button" onClick={onCancel}>
+          Cancelar
+        </button>
+      )}
 
       {error && <p className="error">{error}</p>}
     </form>
