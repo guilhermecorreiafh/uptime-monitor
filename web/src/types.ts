@@ -6,5 +6,7 @@ export type MonitoredService = {
     timeoutSeconds : number
     isActive : boolean
     isUp: boolean | null
+    lastCheckedAt : string | null
+    lastResponseTimeMs : number | null
     createdAt: string
 }
