@@ -34,3 +34,18 @@
   width: 100%;
   margin: 0;
 }
+
+.delete {
+  background: none;
+  border: none;
+  color: var(--text);
+  opacity: 0.4;
+  font-size: 16px;
+  padding: 4px;
+  cursor: pointer;
+}
+
+.delete:hover {
+  opacity: 1;
+  color: #ef4444;
+}

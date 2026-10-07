@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { getServices } from './api'
+import { deleteService, getServices } from './api'
 import { timeAgo } from './format'
 import { ServiceForm } from './ServiceForm'
 import type { MonitoredService } from './types'
@@ -28,6 +28,17 @@ function App() {
   }, [load])
 
   const upCount = services.filter(s => s.isUp).length
+
+  async function handleDelete(service: MonitoredService) {
+    if (!window.confirm(`Excluir "${service.name}"?`)) return
+
+    try {
+      await deleteService(service.id)
+      load()
+    } catch {
+      setError('Não foi possível excluir o serviço')
+    }
+  }
 
   return (
     <main className="container">
@@ -67,6 +78,15 @@ function App() {
                 {timeAgo(service.lastCheckedAt)}
               </small>
             </div>
+
+            <button
+              className="delete"
+              onClick={() => handleDelete(service)}
+              aria-label={`Excluir ${service.name}`}
+            >
+              ✕
+            </button>
+
           </li>
         ))}
       </ul>

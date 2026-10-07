@@ -27,3 +27,11 @@ export async function  createService(service: NewService): Promise<void> {
         throw new Error('Verifique o nome e a URL (precisa começar com http:// ou https://)')
     }
 }
+
+export async function deleteService(id:number): Promise<void> {
+    const response = await fetch (`/api/monitored-services/${id}`, { method: 'DELETE' })
+    
+    if(!response.ok){
+        throw new Error('Erro ao excluir serviço')
+    }
+}
