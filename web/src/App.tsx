@@ -61,7 +61,7 @@ function App() {
       )}
 
       <ServiceForm
-        key={editing?.id ?? 'new'}
+        key={`form-${editing?.id ?? 'new'}`}
         editing={editing}
         onSaved={() => {
           setEditing(null)
@@ -119,7 +119,7 @@ function App() {
 
       {selected && (
         <ServiceDetail
-          key={selected.id}
+          key={`detail-${selected.id}`}
           service={selected}
           onClose={() => setSelectedId(null)}
         />
