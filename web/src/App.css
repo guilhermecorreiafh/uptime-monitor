@@ -164,3 +164,58 @@
   opacity: 1;
   color: #3b82f6;
 }
+
+.service-info {
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.service.selected {
+  border-color: #3b82f6;
+}
+
+.detail {
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.detail-header h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.detail-stats {
+  display: flex;
+  gap: 24px;
+  margin: 16px 0;
+}
+
+.detail-stats div {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-stats small {
+  opacity: 0.6;
+}
+
+.detail-stats strong {
+  font-size: 20px;
+}
+
+.muted {
+  opacity: 0.6;
+}

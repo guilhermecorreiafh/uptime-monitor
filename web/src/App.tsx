@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { deleteService, getServices } from './api'
 import { timeAgo } from './format'
+import { ServiceDetail } from './ServiceDetail'
 import { ServiceForm } from './ServiceForm'
 import type { MonitoredService } from './types'
 import { useTheme } from './useTheme'
@@ -10,6 +11,7 @@ function App() {
   const [services, setServices] = useState<MonitoredService[]>([])
   const [error, setError] = useState<string | null>(null)
   const [editing, setEditing] = useState<MonitoredService | null>(null)
+  const [selectedId, setSelectedId] = useState<number | null>(null)
   const { theme, toggleTheme } = useTheme()
 
   const load = useCallback(() => {
@@ -29,6 +31,7 @@ function App() {
   }, [load])
 
   const upCount = services.filter(s => s.isUp).length
+  const selected = services.find(s => s.id === selectedId) ?? null
 
   async function handleDelete(service: MonitoredService) {
     if (!window.confirm(`Excluir "${service.name}"?`)) return
@@ -71,13 +74,19 @@ function App() {
 
       <ul className="service-list">
         {services.map(service => (
-          <li key={service.id} className="service">
+          <li
+            key={service.id}
+            className={`service ${service.id === selectedId ? 'selected' : ''}`}
+          >
             <span className={`dot ${statusClass(service.isUp)}`} />
 
-            <div className="service-info">
+            <button
+              className="service-info"
+              onClick={() => setSelectedId(service.id === selectedId ? null : service.id)}
+            >
               <strong>{service.name}</strong>
               <small className="url">{service.url}</small>
-            </div>
+            </button>
 
             <div className="service-meta">
               <span className={`status ${statusClass(service.isUp)}`}>
@@ -104,10 +113,17 @@ function App() {
             >
               ✕
             </button>
-
           </li>
         ))}
       </ul>
+
+      {selected && (
+        <ServiceDetail
+          key={selected.id}
+          service={selected}
+          onClose={() => setSelectedId(null)}
+        />
+      )}
     </main>
   )
 }

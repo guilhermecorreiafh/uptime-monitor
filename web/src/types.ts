@@ -10,3 +10,11 @@ export type MonitoredService = {
     lastResponseTimeMs : number | null
     createdAt: string
 }
+
+export type CheckResult = {
+  checkedAt: string
+  isSuccess: boolean
+  statusCode: number | null
+  responseTimeMs: number
+  error: string | null
+}

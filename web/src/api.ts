@@ -1,4 +1,4 @@
-import type { MonitoredService } from "./types";
+import type { CheckResult, MonitoredService } from './types'
 
 export async function getServices(): Promise<MonitoredService[]> {
     const response = await fetch('/api/monitored-services')
@@ -46,4 +46,14 @@ export async function updateService(id: number, service: NewService): Promise<vo
     if (!response.ok) {
         throw new Error('Verifique o nome e a URL (precisa começar com http:// ou https://)')
     }
+}
+
+export async function getResults(id: number, limit = 50): Promise<CheckResult[]> {
+    const response = await fetch(`/api/monitored-services/${id}/results?limit=${limit}`)
+
+    if (!response.ok) {
+        throw new Error('Erro ao carregar histórico')
+    }
+
+    return response.json()
 }
