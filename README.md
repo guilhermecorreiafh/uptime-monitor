@@ -8,7 +8,7 @@ Monitor de uptime self-hosted: você cadastra as URLs, ele checa cada uma de tem
 
 ## De onde veio a ideia
 
-No meu ambiente de trabalho, lido com sistemas que rodam como serviços em segundo plano, e uma das coisas que mais dá dor de cabeça é descobrir tarde que um deles parou. Cheguei a criar no trabalho a regra que identifica serviço parado num desses sistemas e a desenhar um monitor com alertas.
+No meu ambiente de trabalho, lido com sistemas que rodam como serviços em segundo plano, e uma das coisas que mais dá dor de cabeça é descobrir tarde que um deles parou. Cheguei a criar lá a regra que identifica quando há um serviço parado num desses sistemas e a desenhar um monitor com alertas.
 
 Quis levar essa ideia adiante num projeto meu, do zero e genérico: qualquer URL, qualquer serviço, com front, API, testes e tudo rodando com um comando.
 
@@ -28,11 +28,11 @@ Quis levar essa ideia adiante num projeto meu, do zero e genérico: qualquer URL
 
 ## Stack
 
-**Back-end:** .NET 10, ASP.NET Core, Entity Framework Core, PostgreSQL
-**Front-end:** React, TypeScript, Vite, Recharts
-**Infra:** Docker Compose, Nginx, GitHub Actions
-**Observabilidade:** OpenTelemetry, Aspire Dashboard
-**Testes:** xUnit
+- **Back-end:** .NET 10, ASP.NET Core, Entity Framework Core, PostgreSQL
+- **Front-end:** React, TypeScript, Vite, Recharts
+- **Infra:** Docker Compose, Nginx, GitHub Actions
+- **Observabilidade:** OpenTelemetry, Aspire Dashboard
+- **Testes:** xUnit
 
 ## Como funciona
 
@@ -141,3 +141,18 @@ Rodam também a cada push pelo GitHub Actions.
 
 - Deploy numa VM, com o painel público em modo somente leitura
 - Proteger o cadastro e a exclusão de serviços
+
+## Contribuições
+
+Contribuições são bem-vindas! Fique à vontade pra abrir issues e pull requests com melhorias ou correções.
+
+## Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+## Autor
+
+Feito por **Guilherme Correia**, estudante de Sistemas de Informação.
+
+- [LinkedIn](https://www.linkedin.com/in/guilherme-correia-b0a816261)
+- [GitHub](https://github.com/guilhermecorreiafh)
