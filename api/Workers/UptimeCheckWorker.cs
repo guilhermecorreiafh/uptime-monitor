@@ -1,8 +1,9 @@
 using System.Diagnostics;
+using System.Diagnostics.Metrics;
 using Microsoft.EntityFrameworkCore;
+using UptimeMonitor.Api.Alerts;
 using UptimeMonitor.Api.Data;
 using UptimeMonitor.Api.Models;
-using UptimeMonitor.Api.Alerts;
 
 namespace UptimeMonitor.Api.Workers;
 
@@ -13,6 +14,14 @@ public class UptimeCheckWorker(
     ILogger<UptimeCheckWorker> logger) : BackgroundService
 {
     private static readonly TimeSpan Tick = TimeSpan.FromSeconds(5);
+
+    private static readonly Meter Meter = new("UptimeMonitor");
+
+    private static readonly Counter<long> ChecksCounter =
+        Meter.CreateCounter<long>("uptime.checks", description: "Checagens executadas");
+
+    private static readonly Histogram<int> ResponseTimeHistogram =
+        Meter.CreateHistogram<int>("uptime.response_time", unit: "ms", description: "Tempo de resposta das checagens");
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -39,16 +48,25 @@ public class UptimeCheckWorker(
         var now = DateTime.UtcNow;
 
         var services = await db.MonitoredServices
-        .Where(s => s.IsActive)
-        .ToListAsync(ct);
+            .Where(s => s.IsActive)
+            .ToListAsync(ct);
 
         var dueServices = services.Where(s =>
-        s.LastCheckedAt is null ||
-        (now - s.LastCheckedAt.Value).TotalSeconds >= s.IntervalSeconds);
+            s.LastCheckedAt is null ||
+            (now - s.LastCheckedAt.Value).TotalSeconds >= s.IntervalSeconds);
 
         foreach (var service in dueServices)
         {
             var result = await CheckAsync(service, ct);
+
+            var tags = new TagList
+            {
+                { "service", service.Name },
+                { "status", result.IsSuccess ? "up" : "down" }
+            };
+
+            ChecksCounter.Add(1, tags);
+            ResponseTimeHistogram.Record(result.ResponseTimeMs, tags);
 
             db.CheckResults.Add(result);
             service.LastCheckedAt = result.CheckedAt;
@@ -60,8 +78,8 @@ public class UptimeCheckWorker(
             if (StatusTransition.ShouldAlert(previousIsUp, result.IsSuccess))
             {
                 var message = result.IsSuccess
-                ? $"✅ **{service.Name}** voltou ao ar ({result.ResponseTimeMs}ms)"
-                : $"🔴 **{service.Name}** caiu: {result.Error ?? $"status {result.StatusCode}"}";
+                    ? $"✅ **{service.Name}** voltou ao ar ({result.ResponseTimeMs}ms)"
+                    : $"🔴 **{service.Name}** caiu: {result.Error ?? $"status {result.StatusCode}"}";
 
                 await alertService.SendAsync(message, ct);
             }

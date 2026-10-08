@@ -37,7 +37,7 @@ builder.Services.AddOpenTelemetry()
         .AddAspNetCoreInstrumentation()
         .AddHttpClientInstrumentation()
         .AddMeter("UptimeMonitor"))
-    .WithLogging()
+    .WithLogging(logging => { }, options => options.IncludeFormattedMessage = true)
     .UseOtlpExporter();
 
 var app = builder.Build();
@@ -48,8 +48,6 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
-
-app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
