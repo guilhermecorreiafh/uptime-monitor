@@ -10,6 +10,11 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U uptime -d uptime"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   dashboard:
     image: mcr.microsoft.com/dotnet/aspire-dashboard:latest
@@ -19,6 +24,27 @@ services:
     ports:
       - "18888:18888"
       - "4317:18889"
+
+  api:
+    build: ./api
+    container_name: uptime-api
+    environment:
+      ConnectionStrings__Default: "Host=db;Port=5432;Database=uptime;Username=uptime;Password=uptime"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://dashboard:18889"
+      Alerts__DiscordWebhookUrl: ${DISCORD_WEBHOOK_URL:-}
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+
+  web:
+    build: ./web
+    container_name: uptime-web
+    depends_on:
+      - api
+    ports:
+      - "3000:80"
 
 volumes:
   pgdata:
