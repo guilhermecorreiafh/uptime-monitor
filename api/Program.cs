@@ -3,6 +3,11 @@ using UptimeMonitor.Api.Data;
 using Scalar.AspNetCore;
 using UptimeMonitor.Api.Workers;
 using UptimeMonitor.Api.Alerts;
+using OpenTelemetry;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +26,19 @@ builder.Services.AddHttpClient();
 builder.Services.AddHostedService<UptimeCheckWorker>();
 
 builder.Services.AddSingleton<DiscordAlertService>();
+
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(resource => resource.AddService("uptime-monitor-api"))
+    .WithTracing(tracing => tracing
+        .AddAspNetCoreInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddNpgsql())
+    .WithMetrics(metrics => metrics
+        .AddAspNetCoreInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddMeter("UptimeMonitor"))
+    .WithLogging()
+    .UseOtlpExporter();
 
 var app = builder.Build();
 
