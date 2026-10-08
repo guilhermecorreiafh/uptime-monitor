@@ -8,7 +8,7 @@ Monitor de uptime self-hosted: você cadastra as URLs, ele checa cada uma de tem
 
 ## De onde veio a ideia
 
-No meu estágio eu trabalho com sistemas que rodam como serviços em segundo plano, e uma das coisas que mais dá dor de cabeça é descobrir tarde que um deles parou. Cheguei a criar no trabalho a regra que identifica serviço parado num desses sistemas e a desenhar um monitor com alertas.
+No meu ambiente de trabalho, lido com sistemas que rodam como serviços em segundo plano, e uma das coisas que mais dá dor de cabeça é descobrir tarde que um deles parou. Cheguei a criar no trabalho a regra que identifica serviço parado num desses sistemas e a desenhar um monitor com alertas.
 
 Quis levar essa ideia adiante num projeto meu, do zero e genérico: qualquer URL, qualquer serviço, com front, API, testes e tudo rodando com um comando.
 
@@ -47,6 +47,16 @@ flowchart LR
 ```
 
 A API e o worker rodam no mesmo processo. O worker acorda a cada 5 segundos, vê quais serviços já passaram do intervalo e checa só esses. O front não fala direto com a API: o Nginx serve os arquivos do React e repassa tudo que é `/api` pra ela.
+
+## Observabilidade
+
+A API é instrumentada com OpenTelemetry e manda logs, traces e métricas pro Aspire Dashboard, que sobe junto no Docker Compose.
+
+Dá pra seguir uma requisição do começo ao fim, vendo quanto tempo ela levou e qual consulta fez no banco. Além das métricas automáticas, o worker publica métricas próprias: `uptime.checks` (quantidade de checagens, por serviço e por status) e `uptime.response_time` (tempo de resposta).
+
+![Trace no Aspire Dashboard](docs/telemetria.png)
+
+Como tudo sai pelo protocolo padrão (OTLP), trocar o dashboard por outra ferramenta, como Grafana, é só mudar o endereço de destino.
 
 ## Rodando
 
